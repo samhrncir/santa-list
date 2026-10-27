@@ -22,6 +22,10 @@ The backdrop can be switched between Santa's desk, falling snow that reacts to t
 
 Other scripts: `npm test` (unit tests with vitest), `npm run lint`, `npm run typecheck`, `npm run build`.
 
+## Demo mode (no Firebase needed)
+
+`npm run dev:demo` starts the app with `NEXT_PUBLIC_DEMO_MODE=true`. A pretend "Demo Parent" account replaces Google sign-in and letters are kept in the browser's localStorage instead of Firestore, pre-seeded with one example letter. Everything else behaves the same: editing, the sharing toggle, "Get a new link", the backgrounds, and live updates when the shared page is open in another tab. A shared link only works in the same browser, since that is where the letters live. The app also falls back to demo mode by itself when no Firebase configuration is present, with a banner saying so.
+
 ## Setting up Firebase from scratch
 
 1. Create a project at https://console.firebase.google.com and add a **Web** app. Put its config in `.env.local` (and in Vercel's environment variables for deployments).

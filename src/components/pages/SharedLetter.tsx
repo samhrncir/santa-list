@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import Footer from "@/components/Footer";
 import LetterContent from "@/components/letter/LetterContent";
 import LetterSheet from "@/components/letter/LetterSheet";
-import Notice, { ConfigNotice, LoadingLetter } from "@/components/Notice";
+import Notice, { LoadingLetter } from "@/components/Notice";
 import SceneSwitcher from "@/components/SceneSwitcher";
 import TopBar, { UserMenu } from "@/components/TopBar";
 import Background from "@/components/scenes/Background";
@@ -21,14 +21,14 @@ const LOADING: LetterState = { status: "loading" };
 /** Read-only view for anyone who holds the private link. No sign-in required. */
 export default function SharedLetter() {
   const { id } = useParams<{ id: string }>();
-  const { user, loading, configured } = useAuth();
+  const { user, loading } = useAuth();
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [sceneOverride, setSceneOverride] = useState<Scene | null>(null);
 
   useEffect(() => {
-    if (!configured || loading) return;
-    return subscribeLetter(id, (state) => setSnapshot({ id, state }));
-  }, [id, configured, loading]);
+    if (loading) return;
+    return subscribeLetter(id, (state) => setSnapshot({ id, state }), { asGuest: true });
+  }, [id, loading]);
 
   const state = snapshot?.id === id ? snapshot.state : LOADING;
   const letter = state.status === "ready" ? state.letter : null;
@@ -47,8 +47,7 @@ export default function SharedLetter() {
   );
 
   let body;
-  if (!configured) body = <ConfigNotice />;
-  else if (loading || state.status === "loading") body = <LoadingLetter text="Unfolding the letter…" />;
+  if (loading || state.status === "loading") body = <LoadingLetter text="Unfolding the letter…" />;
   else if (state.status === "missing") {
     body = (
       <Notice title="No letter here" action={writeYourOwn}>

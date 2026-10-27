@@ -111,6 +111,23 @@ body {
 .link-btn:hover {
   border-color: #f7dc9a;
 }
+.topbar-name {
+  color: #f7dc9a;
+}
+/* Demo mode strip under the top bar. */
+.demo-banner {
+  position: relative;
+  z-index: 19;
+  margin: 0;
+  padding: 0.35rem 1rem;
+  text-align: center;
+  font-family: var(--font-caps);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  color: #2b1a0f;
+  background: linear-gradient(to bottom, #f1d27d, #c9a24a);
+  border-bottom: 1px solid rgba(90, 60, 20, 0.4);
+}
 
 /* ============ parchment ============ */
 .letter-wrap {

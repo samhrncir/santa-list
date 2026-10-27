@@ -23,17 +23,6 @@ export function LoadingLetter({ text = "Fetching your letter from the North Pole
   );
 }
 
-export function ConfigNotice() {
-  return (
-    <Notice title="Not quite ready">
-      <p>
-        This copy of Letters to Santa has no Firebase configuration yet. Copy <code>.env.example</code> to{" "}
-        <code>.env.local</code>, paste in your Firebase web app settings, and restart the dev server.
-      </p>
-    </Notice>
-  );
-}
-
 export function ErrorBanner({ message, onDismiss }: { message: string; onDismiss: () => void }) {
   return (
     <div className="error-banner" role="alert">

@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import Footer from "@/components/Footer";
 import LetterContent, { type LetterHandlers } from "@/components/letter/LetterContent";
 import LetterSheet from "@/components/letter/LetterSheet";
-import Notice, { ConfigNotice, ErrorBanner, LoadingLetter } from "@/components/Notice";
+import Notice, { ErrorBanner, LoadingLetter } from "@/components/Notice";
 import SceneSwitcher from "@/components/SceneSwitcher";
 import ShareDialog from "@/components/ShareDialog";
 import SignInCard from "@/components/SignInCard";
@@ -35,7 +35,7 @@ const LOADING: LetterState = { status: "loading" };
 export default function LetterEditor() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const { user, loading, configured } = useAuth();
+  const { user, loading } = useAuth();
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
   const [movingFrom, setMovingFrom] = useState<string | null>(null);
@@ -43,9 +43,9 @@ export default function LetterEditor() {
   const [storedScene] = useStoredScene();
 
   useEffect(() => {
-    if (!configured || loading || !user) return;
+    if (loading || !user) return;
     return subscribeLetter(id, (state) => setSnapshot({ id, state }));
-  }, [id, configured, loading, user]);
+  }, [id, loading, user]);
 
   // Snapshots are keyed by id so a stale subscription can never show the wrong letter.
   const state = snapshot?.id === id ? snapshot.state : LOADING;
@@ -93,8 +93,7 @@ export default function LetterEditor() {
   );
 
   let body;
-  if (!configured) body = <ConfigNotice />;
-  else if (loading) body = <LoadingLetter />;
+  if (loading) body = <LoadingLetter />;
   else if (!user) {
     body = (
       <SignInCard

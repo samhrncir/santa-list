@@ -19,10 +19,16 @@ function GoogleMark() {
 
 const CANCELLED = new Set(["auth/popup-closed-by-user", "auth/cancelled-popup-request"]);
 
+const REAL_MESSAGE =
+  "Before the reindeer are fed and the sleigh is packed, every good wish ought to be written down. Sign in to write a letter, add wishes with links so the elves get them exactly right, and share it with family by a private link.";
+
+const DEMO_MESSAGE =
+  "This is the demo: there is no Google account to sign in with and no database behind it. Letters you write live only in this browser, which is plenty to try everything out: write a letter, add wishes with links, share it, and change the scenery.";
+
 type Props = { title?: string; message?: string };
 
 export default function SignInCard({ title = "Dear Santa,", message }: Props) {
-  const { signIn } = useAuth();
+  const { signIn, demo } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -43,20 +49,23 @@ export default function SignInCard({ title = "Dear Santa,", message }: Props) {
     <LetterSheet dateText="The North Pole, in the season of giving">
       <h1 className="salutation">{title}</h1>
       <div className="letter-body">
-        <p className="letter-text">
-          {message ??
-            "Before the reindeer are fed and the sleigh is packed, every good wish ought to be written down. Sign in to write a letter, add wishes with links so the elves get them exactly right, and share it with family by a private link."}
-        </p>
+        <p className="letter-text">{message ?? (demo ? DEMO_MESSAGE : REAL_MESSAGE)}</p>
         <ul className="features">
           <li>Write and edit a letter for each child</li>
           <li>Add a link and a note to every wish</li>
           <li>Share it with family through a private link, no account needed to read</li>
         </ul>
         <div className="signin-actions">
-          <button type="button" className="btn btn-wax btn-google" onClick={handleSignIn} disabled={busy}>
-            <GoogleMark />
-            {busy ? "Opening Google…" : "Sign in with Google"}
-          </button>
+          {demo ? (
+            <button type="button" className="btn btn-wax" onClick={handleSignIn} disabled={busy}>
+              Enter as the Demo Parent
+            </button>
+          ) : (
+            <button type="button" className="btn btn-wax btn-google" onClick={handleSignIn} disabled={busy}>
+              <GoogleMark />
+              {busy ? "Opening Google…" : "Sign in with Google"}
+            </button>
+          )}
         </div>
         {error && (
           <p className="field-error" role="alert">

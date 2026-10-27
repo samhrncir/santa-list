@@ -1,13 +1,12 @@
 "use client";
 
-import type { User } from "firebase/auth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { shortDate } from "@/lib/dates";
 import { friendlyError } from "@/lib/errors";
 import { createLetter, deleteLetter, subscribeMyLetters } from "@/lib/letters";
-import { LIMITS, type Letter, type Scene } from "@/lib/types";
+import { LIMITS, type AppUser, type Letter, type Scene } from "@/lib/types";
 import WaxSeal from "./letter/WaxSeal";
 import { ErrorBanner } from "./Notice";
 
@@ -62,7 +61,7 @@ function EnvelopeCard({ letter, onDelete }: { letter: Letter; onDelete: (id: str
   );
 }
 
-export default function LettersIndex({ user, scene }: { user: User; scene: Scene }) {
+export default function LettersIndex({ user, scene }: { user: AppUser; scene: Scene }) {
   const router = useRouter();
   const [letters, setLetters] = useState<Letter[] | null>(null);
   const [error, setError] = useState<string | null>(null);
