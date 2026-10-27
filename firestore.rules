@@ -1,0 +1,56 @@
+rules_version = '2';
+
+// Letters to Santa — Firestore security rules
+//
+// Model: one document per letter in /letters/{letterId}. The document id is a
+// long random string generated client-side, so it doubles as the "private link"
+// secret (the same way Google Photos "anyone with the link" works).
+//
+//  * The owner (ownerId == auth uid) can do everything with their own letters.
+//  * Anyone who knows a letter's id can *get* it while `sharing` is true.
+//  * Nobody can enumerate letters: `list` is only allowed for an owner's own
+//    letters (the query must filter on ownerId == their uid).
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner() {
+      return signedIn() && resource != null && resource.data.ownerId == request.auth.uid;
+    }
+
+    function validLetter(d) {
+      return d.keys().hasOnly(['ownerId', 'childName', 'intro', 'items', 'sharing', 'background', 'createdAt', 'updatedAt'])
+        && d.keys().hasAll(['ownerId', 'childName', 'intro', 'items', 'sharing', 'background', 'createdAt', 'updatedAt'])
+        && d.ownerId is string
+        && d.childName is string && d.childName.size() <= 60
+        && d.intro is string && d.intro.size() <= 2000
+        && d.items is list && d.items.size() <= 300
+        && d.sharing is bool
+        && d.background in ['desk', 'snow', 'table']
+        && d.createdAt is timestamp
+        && d.updatedAt is timestamp;
+    }
+
+    match /letters/{letterId} {
+      // Reading a missing document is allowed so the app can show "not found"
+      // instead of "private"; it reveals nothing.
+      allow get: if resource == null || resource.data.sharing == true || isOwner();
+
+      allow list: if signedIn() && resource.data.ownerId == request.auth.uid;
+
+      allow create: if signedIn()
+        && request.resource.data.ownerId == request.auth.uid
+        && validLetter(request.resource.data);
+
+      allow update: if isOwner()
+        && request.resource.data.ownerId == resource.data.ownerId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && validLetter(request.resource.data);
+
+      allow delete: if isOwner();
+    }
+  }
+}
